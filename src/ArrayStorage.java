@@ -4,66 +4,75 @@ import java.util.Arrays;
  * Array based storage for Resumes
  */
 public class ArrayStorage {
-    Resume[] storage = new Resume[10000];
-    int size = 0;
+    private Resume[] storage = new Resume[10_000];
+    private int size = 0;
 
-    void clear() {
-        Arrays.fill(storage, null);
+    public void clear() {
+        Arrays.fill(storage, 0, size, null);
         size = 0;
     }
 
-    void save(Resume resume) {
-        if (size == 9999) System.out.println("Error. Storage is full.");
-        else {
-            if (find(resume) == null) storage[size] = resume;
+    public void save(Resume resume) {
+        Integer i = findIndex(resume.getUuid());
+        if (i != null || size < storage.length) {
+            storage[size] = resume;
             size++;
+        } else {
+            System.out.println("Error. Can't save this uuid.");
         }
     }
 
-    Resume get(String uuid) {
-        if (find(uuid) != null) {
-            return storage[find(uuid)];
-        } else System.out.println("Error. Uuid not found.");
+    public Resume get(String uuid) {
+        Integer i = findIndex(uuid);
+        if (i != null) {
+            return storage[i];
+        } else {
+            noUuid();
+        }
         return null;
     }
 
-    void update(Resume resume) {
-        if (find(resume) != null) {
-            storage[find(resume)] = resume;
-        } else System.out.println("Error. Resume not found.");
+    public void update(Resume resume) {
+        Integer i = findIndex(resume.getUuid());
+        if (i != null) {
+            storage[i] = resume;
+        } else {
+            noUuid();
+        }
     }
 
-    void delete(String uuid) {
-        if (find(uuid) != null) {
-            storage[(find(uuid))] = storage[size - 1];
+    public void delete(String uuid) {
+        Integer i = findIndex(uuid);
+        if (i != null) {
+            storage[i] = storage[size - 1];
             storage[size - 1] = null;
             size--;
-        } else System.out.println("Error. Uuid not found.");
+        } else {
+            noUuid();
+        }
     }
 
-    Integer find(Resume resume) {
+    public Integer findIndex(String uuid) {
         for (int i = 0; i < size; i++) {
-            if (resume == storage[i]) return i;
+            if (uuid.equals(storage[i].getUuid())) {
+                return i;
+            }
         }
         return null;
     }
 
-    Integer find(String uuid) {
-        for (int i = 0; i < size; i++) {
-            if (uuid == storage[i].uuid) return i;
-        }
-        return null;
+    public void noUuid() {
+        System.out.println("Error. Uuid not found.");
     }
 
     /**
      * @return array, contains only Resumes in storage (without null)
      */
-    Resume[] getAll() {
-        Resume[] result = Arrays.copyOf(storage, size);
-        return result;
+    public Resume[] getAll() {
+        return Arrays.copyOf(storage, size);
     }
 
-    int size() {
+    public int size() {
         return size;
     }
 }
