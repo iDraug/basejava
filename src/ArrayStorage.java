@@ -13,56 +13,56 @@ public class ArrayStorage {
     }
 
     public void save(Resume resume) {
-        Integer i = findIndex(resume.getUuid());
-        if (i != null || size < storage.length) {
-            storage[size] = resume;
-            size++;
+        Integer resumeIndex = findIndex(resume.getUuid());
+        if (resumeIndex == null) {
+            if (size >= storage.length - 1) {
+                System.out.println("Error. Storage is full.");
+            } else {
+                storage[size] = resume;
+                size++;
+            }
         } else {
-            System.out.println("Error. Can't save this uuid.");
+            System.out.println("Error. This uuid already in storage.");
         }
     }
 
     public Resume get(String uuid) {
-        Integer i = findIndex(uuid);
-        if (i != null) {
-            return storage[i];
+        Integer resumeIndex = findIndex(uuid);
+        if (resumeIndex != null) {
+            return storage[resumeIndex];
         } else {
-            noUuid();
+            System.out.println("Error. Can't get this uuid.");
+            return null;
         }
-        return null;
     }
 
     public void update(Resume resume) {
-        Integer i = findIndex(resume.getUuid());
-        if (i != null) {
-            storage[i] = resume;
+        Integer resumeIndex = findIndex(resume.getUuid());
+        if (resumeIndex != null) {
+            storage[resumeIndex] = resume;
         } else {
-            noUuid();
+            System.out.println("Error. Can't update this uuid.");
         }
     }
 
     public void delete(String uuid) {
-        Integer i = findIndex(uuid);
-        if (i != null) {
-            storage[i] = storage[size - 1];
+        Integer resumeIndex = findIndex(uuid);
+        if (resumeIndex != null) {
+            storage[resumeIndex] = storage[size - 1];
             storage[size - 1] = null;
             size--;
         } else {
-            noUuid();
+            System.out.println("Error. Can't delete this uuid.");
         }
     }
 
-    public Integer findIndex(String uuid) {
+    private Integer findIndex(String uuid) {
         for (int i = 0; i < size; i++) {
             if (uuid.equals(storage[i].getUuid())) {
                 return i;
             }
         }
         return null;
-    }
-
-    public void noUuid() {
-        System.out.println("Error. Uuid not found.");
     }
 
     /**
