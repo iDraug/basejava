@@ -5,7 +5,7 @@ import model.Resume;
 import java.util.Arrays;
 
 public abstract class AbstractArrayStorage implements Storage {
-    protected static final int STORAGE_LIMIT = 10_000;
+    protected static final int STORAGE_LIMIT = 2;
 
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
     protected int size = 0;
@@ -41,9 +41,20 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    public abstract void save(Resume resume);
+    public void delete(String uuid) {
+        int index = findIndex(uuid);
+        if (index < 0) {
+            System.out.println("Error. Can't delete this uuid.");
+        } else {
+            for (int i = 0; i < size - 1; i++) {
+                storage[index] = storage[index + 1];
+            }
+            storage[size - 1] = null;
+            size--;
+        }
+    }
 
-    public abstract void delete(String uuid);
+    public abstract void save(Resume resume);
 
     protected abstract int findIndex(String uuid);
 }
