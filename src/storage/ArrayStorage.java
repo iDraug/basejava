@@ -8,15 +8,13 @@ import model.Resume;
 public class ArrayStorage extends AbstractArrayStorage {
 
     @Override
-    public void save(Resume resume) {
-        if (findIndex(resume.getUuid()) != -1) {
-            System.out.println("Resume " + resume.getUuid() + " already exist");
-        } else if (size >= STORAGE_LIMIT) {
-            System.out.println("Storage overflow");
-        } else {
-            storage[size] = resume;
-            size++;
-        }
+    protected void deletePosition(int index) {
+        storage[index] = storage[size - 1];
+    }
+
+    @Override
+    protected void savePosition(Resume resume, int index) {
+        storage[size] = resume;
     }
 
     @Override
