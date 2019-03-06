@@ -17,16 +17,6 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public Resume get(String uuid) {
-        int index = findIndex(uuid);
-        if (index < 0) {
-            System.out.println("Resume " + uuid + " not exist");
-            return null;
-        }
-        return storage[index];
-    }
-
-    @Override
     public void update(Resume resume) {
         int index = findIndex(resume.getUuid());
         if (index < 0) {
@@ -37,13 +27,26 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public int size() {
-        return size;
+    public void save(Resume resume) {
+        int index = findIndex(resume.getUuid());
+        if (index > 0) {
+            System.out.println("Resume " + resume.getUuid() + " already exist");
+        } else if (size >= STORAGE_LIMIT) {
+            System.out.println("Storage overflow");
+        } else {
+            savePosition(resume, index);
+            size++;
+        }
     }
 
     @Override
-    public Resume[] getAll() {
-        return Arrays.copyOfRange(storage, 0, size);
+    public Resume get(String uuid) {
+        int index = findIndex(uuid);
+        if (index < 0) {
+            System.out.println("Resume " + uuid + " not exist");
+            return null;
+        }
+        return storage[index];
     }
 
     @Override
@@ -59,17 +62,15 @@ public abstract class AbstractArrayStorage implements Storage {
     }
 
     @Override
-    public void save(Resume resume) {
-        int index = findIndex(resume.getUuid());
-        if (index < 0) {
-            System.out.println("Resume " + resume.getUuid() + " already exist");
-        } else if (size >= STORAGE_LIMIT) {
-            System.out.println("Storage overflow");
-        } else {
-            savePosition(resume, index);
-            size++;
-        }
+    public Resume[] getAll() {
+        return Arrays.copyOfRange(storage, 0, size);
     }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
     protected abstract void savePosition(Resume r, int index);
 
     protected abstract void deletePosition(int index);
