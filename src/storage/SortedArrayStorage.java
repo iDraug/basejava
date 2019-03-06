@@ -8,9 +8,8 @@ public class SortedArrayStorage extends AbstractArrayStorage {
 
     @Override
     protected void deletePosition(int index) {
-        int localPosition = size - 1;
-        if (index < localPosition) {
-            System.arraycopy(storage, index + 1, storage, index, size - index);
+        if (index < size - 1) {
+            System.arraycopy(storage, index + 1, storage, index, size - index - 1);
         }
     }
 
