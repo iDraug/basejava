@@ -11,17 +11,17 @@ import org.junit.Test;
 public class AbstractArrayStorageTest {
     private Storage storage;
 
-    public AbstractArrayStorageTest(Storage storage) {
-        this.storage = storage;
-    }
-
     private static final String UUID_1 = "uuid1";
     private static final String UUID_2 = "uuid2";
     private static final String UUID_3 = "uuid3";
     private static final String UUID_4 = "uuid4";
-    private static Resume R1 = new Resume(UUID_1);
-    private static Resume R2 = new Resume(UUID_2);
-    private static Resume R3 = new Resume(UUID_3);
+    private static final Resume R1 = new Resume(UUID_1);
+    private static final Resume R2 = new Resume(UUID_2);
+    private static final Resume R3 = new Resume(UUID_3);
+
+    protected AbstractArrayStorageTest(Storage storage) {
+        this.storage = storage;
+    }
 
     @Before
     public void setUp() throws Exception {
@@ -32,16 +32,14 @@ public class AbstractArrayStorageTest {
     }
 
     @Test
-    public void clear() {
-        storage.clear();
-        Assert.assertEquals(0, storage.size());
+    public void size() {
+        Assert.assertEquals(3, storage.size());
     }
 
     @Test
-    public void update() {
-        Resume newResume = new Resume(UUID_1);
-        storage.update(newResume);
-        Assert.assertEquals(newResume, storage.get(UUID_1));
+    public void clear() {
+        storage.clear();
+        Assert.assertEquals(0, storage.size());
     }
 
     @Test
@@ -49,6 +47,7 @@ public class AbstractArrayStorageTest {
         Resume R4 = new Resume(UUID_4);
         storage.save(R4);
         Assert.assertEquals(4, storage.size());
+        Assert.assertEquals(R4, storage.get(UUID_4));
     }
 
     @Test
@@ -58,24 +57,25 @@ public class AbstractArrayStorageTest {
         Assert.assertEquals(R3, storage.get(UUID_3));
     }
 
-    @Test
+    @Test(expected = NotExistStorageException.class)
     public void delete() {
-        storage.delete("uuid1");
+        storage.delete(UUID_1);
         Assert.assertEquals(2, storage.size());
+        storage.get(UUID_1);
+    }
+
+    @Test
+    public void update() {
+        Resume newResume = new Resume(UUID_1);
+        storage.update(newResume);
+        Assert.assertTrue(newResume == storage.get(UUID_1));
     }
 
     @Test
     public void getAll() {
         Resume[] array = storage.getAll();
         Assert.assertEquals(3, array.length);
-        Assert.assertEquals("uuid1", array[0].getUuid());
-        Assert.assertEquals("uuid2", array[1].getUuid());
-        Assert.assertEquals("uuid3", array[2].getUuid());
-    }
-
-    @Test
-    public void size() {
-        Assert.assertEquals(3, storage.size());
+        Assert.assertArrayEquals(array, storage.getAll());
     }
 
     @Test(expected = ExistStorageException.class)
@@ -83,20 +83,32 @@ public class AbstractArrayStorageTest {
         storage.save(R1);
     }
 
-    @Test(expected = StorageException.class)
-    public void storageOverflow() throws Exception {
-        try {
-            for (int i = 4; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume());
-            }
-        } catch (StorageException e) {
-            Assert.fail();
-        }
-        storage.save(new Resume());
-    }
-
     @Test(expected = NotExistStorageException.class)
     public void getNotExist() {
         storage.get("dummy");
+    }
+
+    @Test(expected = NotExistStorageException.class)
+    public void deleteNotExist() {
+        storage.delete("dummy");
+    }
+
+    @Test(expected = NotExistStorageException.class)
+    public void updateNotExist() {
+        Resume R5 = new Resume();
+        storage.update(R5);
+    }
+
+    @Test(expected = StorageException.class)
+    public void storageOverflow() throws Exception {
+        storage.clear();
+        try {
+            for (int i = 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
+                storage.save(new Resume());
+            }
+        } catch (StorageException e) {
+            Assert.fail("Test failed. Overflow before storage has been filled.");
+        }
+        storage.save(new Resume());
     }
 }
