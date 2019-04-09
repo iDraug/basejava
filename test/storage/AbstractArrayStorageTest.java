@@ -55,6 +55,19 @@ public class AbstractArrayStorageTest {
         storage.save(R1);
     }
 
+    @Test(expected = StorageException.class)
+    public void storageOverflow() throws Exception {
+        storage.clear();
+        try {
+            for (int i = 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
+                storage.save(new Resume());
+            }
+        } catch (StorageException e) {
+            Assert.fail("Test failed. Overflow before storage has been filled.");
+        }
+        storage.save(new Resume());
+    }
+
     @Test
     public void get() {
         Assert.assertEquals(R1, storage.get(UUID_1));
@@ -95,20 +108,6 @@ public class AbstractArrayStorageTest {
     @Test
     public void getAll() {
         Resume[] array = {R1, R2, R3};
-        Assert.assertEquals(3, array.length);
         Assert.assertArrayEquals(array, storage.getAll());
-    }
-
-    @Test(expected = StorageException.class)
-    public void storageOverflow() throws Exception {
-        storage.clear();
-        try {
-            for (int i = 1; i <= AbstractArrayStorage.STORAGE_LIMIT; i++) {
-                storage.save(new Resume());
-            }
-        } catch (StorageException e) {
-            Assert.fail("Test failed. Overflow before storage has been filled.");
-        }
-        storage.save(new Resume());
     }
 }

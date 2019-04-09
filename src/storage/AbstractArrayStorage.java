@@ -7,7 +7,7 @@ import model.Resume;
 
 import java.util.Arrays;
 
-public abstract class AbstractArrayStorage implements Storage {
+public abstract class AbstractArrayStorage extends AbstractStorage {
     protected static final int STORAGE_LIMIT = 10_000;
 
     protected Resume[] storage = new Resume[STORAGE_LIMIT];
@@ -17,16 +17,6 @@ public abstract class AbstractArrayStorage implements Storage {
     public void clear() {
         Arrays.fill(storage, 0, size, null);
         size = 0;
-    }
-
-    @Override
-    public void update(Resume resume) {
-        int index = findIndex(resume.getUuid());
-        if (index < 0) {
-            throw new NotExistStorageException(resume.getUuid());
-        } else {
-            storage[index] = resume;
-        }
     }
 
     @Override
@@ -40,15 +30,6 @@ public abstract class AbstractArrayStorage implements Storage {
             savePosition(resume, index);
             size++;
         }
-    }
-
-    @Override
-    public Resume get(String uuid) {
-        int index = findIndex(uuid);
-        if (index < 0) {
-            throw new NotExistStorageException(uuid);
-        }
-        return storage[index];
     }
 
     @Override
@@ -68,7 +49,6 @@ public abstract class AbstractArrayStorage implements Storage {
         return Arrays.copyOfRange(storage, 0, size);
     }
 
-    @Override
     public int size() {
         return size;
     }
@@ -76,6 +56,4 @@ public abstract class AbstractArrayStorage implements Storage {
     protected abstract void savePosition(Resume r, int index);
 
     protected abstract void deletePosition(int index);
-
-    protected abstract int findIndex(String uuid);
 }
